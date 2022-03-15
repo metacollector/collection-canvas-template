@@ -48,8 +48,7 @@ function setup() {
 function paintCollection(metacollector) {
     clear();
 
-    setDefaultValues(metacollector);
-    setRandomSeed(metacollector);
+    randomSeed(metacollector.seed + metacollector.iteration);
 
     // Use the visual canvas size values passed in metacollector object for calculating your drawing positions, as it can change between drawings (ie. resizing)
     cs = metacollector.canvas.visualWidth;
@@ -81,26 +80,6 @@ function paintCollection(metacollector) {
     drawImages(tokenList, imageBoxes);
 
     granulate(20);
-}
-
-function setDefaultValues(metacollector) {
-    for (let token of metacollector.artfragments) {
-        let attributes = token.attributes;
-        attributes.energy = attributes.energy || 0.5;
-        attributes.speed = attributes.speed || 0.5;
-        attributes.direction = attributes.direction || random() * TWO_PI;
-    }
-}
-
-function setRandomSeed(metacollector) {
-    num = metacollector.walletAddress
-        .split("")
-        .reduce((acc, cur) => acc * cur.charCodeAt(0), 1);
-    num = num / 10 ** 50;
-    let iteration = metacollector.iteration;
-    num *= iteration + iteration ** 0.5 + iteration ** 2;
-    num = num ** 0.8;
-    randomSeed(num);
 }
 
 function drawStars() {
