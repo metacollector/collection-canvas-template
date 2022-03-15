@@ -18,6 +18,8 @@ Please check the [Generative Canvas Guidelines](#metacollector-generative-canvas
 
 The example generative canvas in this repository use p5.js but you can very well use anything that write into an HMTL canvas, including JavaScript without any library.
 
+<img width="500" alt="Capture d’écran 2022-03-15 à 16 36 16" src="https://user-images.githubusercontent.com/109677/158415352-9ca90525-c93d-4cd2-bd3d-392c0fcdd5af.png">
+
 ## A few metacollector collections to check
 Julien https://metacollector.art/?collectoraddress=tz1VhN58tCJbboQQoyTgLWoCwDUXBidfcAgd
 
