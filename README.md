@@ -1,8 +1,31 @@
-#metacollector generative collection canvas
+# metacollector generative collection canvas
 
-This is a template that you can use to create and test your own metacollector generative *collection canvas*.
+This is a template that you can use as a starting point to create and test your own metacollector generative **collection canvas**.
 
-A metacollector *collection canvas* is a viewer that collectors use to see their metacollector art fragment collection recomposed and recombined into a unique generative artwork.
+A metacollector **collection canvas** is a **generative viewer** that collectors use to see their metacollector art fragment collection recomposed and recombined into a unique generative artwork.
+
+The initial official collection canvas is hosted at https://metacollector.art (it's different from the newer one in this repository created by @pifragile)
+
+This template has been possible thanks to the collaboration with @pifragile, who created the sketch and gave a lot of feedback on how to improve the developer experience 🙏
+
+Please check the [Generative Canvas Guidelines](#metacollector-generative-canvas-guidelines) below for useful development tips and design ruless👇
+
+## How to create your own metacollector generative collection canvas?
+
+- clone the repository
+- modify sketch.js (the example generative canvas)
+- that's it! 
+
+The example generative canvas in this repository use p5.js but you can very well use anything that write into an HMTL canvas, including JavaScript without any library.
+
+## A few metacollector collections to check
+Julien https://metacollector.art/?collectoraddress=tz1VhN58tCJbboQQoyTgLWoCwDUXBidfcAgd
+
+@cabline1 https://metacollector.art/?collectoraddress=tz1T4vkx4aqjbVSysTv8pSp4UPSrVCizMzc7
+
+@emmanuel_2m https://metacollector.art/?collectoraddress=tz1T4vkx4aqjbVSysTv8pSp4UPSrVCizMzc7tz1gLoBxgJG2EstESmyx1ooybVWr7rwHps96
+
+@pifragile https://metacollector.art/?collectoraddress=tz1gJde57Meuqb2xMYbapTPzgTZkiCmPAMZA 
 
 # metacollector Generative Canvas Guidelines
 
