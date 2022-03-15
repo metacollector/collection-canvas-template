@@ -19,8 +19,12 @@ function setup() {
 
 // metacollector = {
 //     walletAddress, // first 3 characters tz1 are always identical
+//     seed, // positive integer, pre-hashed from wallet address as a convenience. Use it as the seed of your random number generator
 //     iteration,
-
+//     canvas: {
+//          visualWidth,  // the visual size of the canvas, as set by metacollector
+//          visualHeight
+//       },
 //     artfragments: [
 //        {
 //        image, // pi5js image object
