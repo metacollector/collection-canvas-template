@@ -13,7 +13,7 @@ Please check the [Generative Canvas Guidelines](#metacollector-generative-canvas
 ## How to create your own metacollector generative collection canvas?
 
 - clone the repository
-- modify sketch.js (the example generative canvas)
+- modify collectioncanvas/sketch.js (the example generative canvas)
 - that's it! 
 
 The example generative canvas in this repository use p5.js but you can very well use anything that write into an HMTL canvas, including JavaScript without any library.
