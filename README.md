@@ -25,7 +25,7 @@ Julien https://metacollector.art/?collectoraddress=tz1VhN58tCJbboQQoyTgLWoCwDUXB
 
 @cabline1 https://metacollector.art/?collectoraddress=tz1T4vkx4aqjbVSysTv8pSp4UPSrVCizMzc7
 
-@emmanuel_2m https://metacollector.art/?collectoraddress=tz1T4vkx4aqjbVSysTv8pSp4UPSrVCizMzc7tz1gLoBxgJG2EstESmyx1ooybVWr7rwHps96
+@emmanuel_2m https://metacollector.art/?collectoraddress=tz1gLoBxgJG2EstESmyx1ooybVWr7rwHps96
 
 @pifragile https://metacollector.art/?collectoraddress=tz1gJde57Meuqb2xMYbapTPzgTZkiCmPAMZA 
 
