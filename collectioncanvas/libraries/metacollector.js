@@ -38,6 +38,8 @@ let collectionCanvas
 let canvasWidth
 let canvasHeight
 
+let imageLoadingCountdown
+
 if (collectorAddressParam) {
     metacollector.walletAddress = collectorAddressParam;
 }
@@ -431,6 +433,8 @@ function parseTokens(tokens) {
                 var ctx = collectionCanvas.getContext('2d');
                 ctx.resetTransform()
                 ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
+                paintCollection(metacollector)
+                ctx.resetTransform()
                 ctx.font = `${(collectionCanvas.width / 20)}px sans-serif`
                 ctx.fillStyle = "white"
                 ctx.textAlign = "center"
