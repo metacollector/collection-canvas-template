@@ -223,14 +223,16 @@ function onWindowResized() {
     canvasWidth = Math.min(window.innerWidth * 1, window.innerHeight * 0.7) * pixelDensity
     canvasHeight = canvasWidth
 
-    collectionCanvas.width = canvasWidth
-    collectionCanvas.height = canvasHeight
-    collectionCanvas.style.width = canvasWidth / pixelDensity + "px"
-    collectionCanvas.style.height = canvasHeight / pixelDensity + "px"
-    metacollector.canvas.visualWidth = canvasWidth / pixelDensity
-    metacollector.canvas.visualHeight = canvasWidth / pixelDensity
+    if (collectionCanvas) {
 
-    paintCollection(metacollector)
+        collectionCanvas.width = canvasWidth
+        collectionCanvas.height = canvasHeight
+        collectionCanvas.style.width = canvasWidth / pixelDensity + "px"
+        collectionCanvas.style.height = canvasHeight / pixelDensity + "px"
+        metacollector.canvas.visualWidth = canvasWidth / pixelDensity
+        metacollector.canvas.visualHeight = canvasWidth / pixelDensity
+        paintCollection(metacollector)
+    }
 }
 
 ////////////////////////// STAT /////////////////////////////////////////////////////
