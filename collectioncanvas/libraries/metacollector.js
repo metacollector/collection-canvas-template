@@ -80,7 +80,7 @@ function init() {
 
     const canvasObserver = new MutationObserver(onCanvasReady)
 
-    const canvasObserverConfig = { childList: true }
+    const canvasObserverConfig = { childList: true, attributes: false, subtree: false, characterData: false }
 
     const targetNode = document.getElementsByTagName('body')[0]
 
@@ -91,17 +91,22 @@ function onCanvasReady(mutationList, observer) {
 
     collectionCanvas = document.getElementsByTagName('canvas')[0];
 
-    collectionCanvas.addEventListener('click', iterateMetacollector)
+    if (collectionCanvas) {
 
-    document.getElementById("canvascontainer").appendChild(collectionCanvas)
+        collectionCanvas.addEventListener('click', iterateMetacollector)
 
-    onWindowResized()
+        document.getElementById("canvascontainer").appendChild(collectionCanvas)
 
-    if (metacollector.walletAddress) {
-        fetchCollectorData(metacollector.walletAddress)
-    }
-    else {
-        noTokensToShow()
+        onWindowResized()
+
+        if (metacollector.walletAddress) {
+            fetchCollectorData(metacollector.walletAddress)
+        }
+        else {
+            noTokensToShow()
+        }
+
+        observer.disconnect()
     }
 }
 
