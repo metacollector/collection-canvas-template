@@ -1,8 +1,8 @@
 # metacollector generative collection canvas
 
-This is a template that you can use as a starting point to create and test your own metacollector generative **collection canvas**.
+This is a template that you can use as a starting point to create and test your own metacollector **collection canvas** generator.
 
-A metacollector **collection canvas** is a **generative viewer** that collectors use to see their metacollector art fragment collection recomposed and recombined into a unique generative artwork.
+A metacollector **collection canvas generator** is a **generative viewer** that collectors use to see their metacollector art fragment collection recomposed and recombined into a unique generative artwork: their collection canvas!
 
 The initial official collection canvas is hosted at https://metacollector.art (it's different from the newer one in this repository created by @pifragile)
 
@@ -10,13 +10,13 @@ This template has been possible thanks to the collaboration with @pifragile, who
 
 Please check the [Generative Canvas Guidelines](#metacollector-generative-canvas-guidelines) below for useful development tips and design ruless👇
 
-## How to create your own metacollector generative collection canvas?
+## How to create your own metacollector collection canvas generator?
 
 - clone the repository
 - modify collectioncanvas/sketch.js (the example generative canvas)
 - that's it! 
 
-The example generative canvas in this repository use p5.js but you can very well use anything that write into an HMTL canvas, including JavaScript without any library.
+The example canvas generator in this repository use p5.js but you can very well use anything that write into an HMTL canvas, including JavaScript without any library.
 
 <img width="500" alt="Capture d’écran 2022-03-15 à 16 36 16" src="https://user-images.githubusercontent.com/109677/158415352-9ca90525-c93d-4cd2-bd3d-392c0fcdd5af.png">
 
