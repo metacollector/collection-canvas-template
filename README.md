@@ -45,7 +45,7 @@ Julien https://metacollector.art/?collectoraddress=tz1VhN58tCJbboQQoyTgLWoCwDUXB
     - The goal is to avoid confusion from the collector: no background would be seen as a bug, but if your background is to involved and loaded with details, it could not make immediate sense that it is incomplete without fragments
     
   - Create a surprising difference between collection: 
-    - make adding or removing a fragment surprising
+    - make adding or removing a fragment from one's wallet surprising. Collecting a new fragment or selling one should lead to interesting changes
     - two collections with the same fragments collected should still have surprising differences because they come from different wallets
 
   - Create a new, visibly changed iteration of the canvas when the collector move to another iteration of the canvas (ie. draw different version for different iteration numbers)
