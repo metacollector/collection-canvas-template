@@ -27,7 +27,8 @@ function setup() {
 //       },
 //     artfragments: [
 //        {
-//        image, // pi5js image object
+//        imageP5, // p5.js image object, exists only if p5.js is detected in global context
+//        imageBitmap, // imageBitmap, native JavaScript interface to store and draw images on canvas. Polyfilled on Safari <= 14
 //        name, // public name of the fragment, several fragments can have the same
 //        attributes: {
 //                family,
@@ -180,7 +181,7 @@ function drawImages(tokenList, imageBoxes) {
         let token = tokenList[i];
         let f = map(token.attributes.size, 0, 1, 0.5, maxSize);
 
-        let img = token.image;
+        let img = token.imageP5;
 
         let shiftAmt = 0.01;
         let shiftFn = () => map(random(), 0, 1, -shiftAmt * cs, shiftAmt * cs);

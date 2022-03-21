@@ -394,6 +394,8 @@ function parseTokens(tokens) {
     document.getElementById('nofragment').style.display = "none"
     imageLoadingCountdown = tokens.length
 
+    loadingMessage(imageLoadingCountdown, tokens[0].token.name)
+
     for (const thisToken of tokens) {
 
         let imageURL = thisToken.token.artifact_uri.replace("ipfs://", "https://ipfs.fleek.co/ipfs/") // using a public gateway. Later we could pin on our own gateway local to the web server to load them faster
@@ -429,62 +431,179 @@ function parseTokens(tokens) {
 
         let parsedAttributes = parseAttributes(thisToken.token.attributes)
 
-        let name = thisToken.token.name
-
         // console.log(parsedAttributes)
 
-        loadImage(
-            imageURL,
-            (image) => {
+        fetch(imageURL).then(
+            (response) => {
+                return response.blob();
+            })
+            .then(
+                (blob) => {
+                    return createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
+                })
+            .then(
+                (bitmap) => {
 
-                var ctx = collectionCanvas.getContext('2d');
-                ctx.resetTransform()
-                ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
-                paintCollection(metacollector)
-                ctx.resetTransform()
-                ctx.font = `${(collectionCanvas.width / 20)}px sans-serif`
-                ctx.fillStyle = "white"
-                ctx.textAlign = "center"
-                ctx.fillText(`loading ${imageLoadingCountdown} images of fragments`, collectionCanvas.width / 2, collectionCanvas.height / 2)
+                    loadingMessage(imageLoadingCountdown, thisToken.token.name)
 
-                for (let i = 1; i <= thisToken.quantity; i++) {
+                    pushImage(bitmap, thisToken, parsedAttributes)
 
-                    let { ...attributes } = parsedAttributes // cloning the attributes
+                    imageLoadingCountdown--
 
-                    let widthToHeightRatio = image.width / image.height // ie. 16/9, 4/3
-
-                    // set longest side of the image to size normalized value
-                    // precompute the other side using the real image ratio
-                    // longest side will always max to 1
-                    if (image.width > image.height) {
-                        attributes.width = attributes.size
-                        attributes.height = attributes.size * widthToHeightRatio
+                    if (imageLoadingCountdown == 0) {
+                        console.log("finished loading images")
+                        let ctx = collectionCanvas.getContext('2d')
+                        ctx.resetTransform()
+                        ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
+                        paintCollection(metacollector)
                     }
-                    else {
-                        attributes.height = attributes.size
-                        attributes.width = attributes.size / widthToHeightRatio
-                    }
-
-                    attributes.width = attributes.size
-                    attributes.height = attributes.size * widthToHeightRatio
-
-                    metacollector.artfragments.push({
-                        name: name,
-                        image: image,
-                        attributes: attributes
-                    })
                 }
+            )
+    }
 
-                imageLoadingCountdown--
+}
 
-                if (imageLoadingCountdown == 0) {
-                    console.log("finished loading images")
-                    ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
-                    paintCollection(metacollector)
-                }
-            }
-        );
+function loadingMessage(countdown, nextName) {
+
+    let ctx = collectionCanvas.getContext('2d')
+    ctx.resetTransform()
+    ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
+
+    paintCollection(metacollector)
+
+    ctx.resetTransform()
+    ctx.font = `${(collectionCanvas.width / 20)}px sans-serif`
+    ctx.fillStyle = "white"
+    ctx.textAlign = "center"
+    ctx.fillText(`loading ${countdown} images of fragments`, collectionCanvas.width / 2, collectionCanvas.height / 2 - collectionCanvas.height / 10)
+    ctx.fillText(`next: ${nextName}`, collectionCanvas.width / 2, collectionCanvas.height / 2 + collectionCanvas.height / 10)
+
+}
 
 
+function pushImage(bitmap, thisToken, parsedAttributes) {
+
+    let { ...attributes } = parsedAttributes // cloning the attributes
+
+    let widthToHeightRatio = bitmap.width / bitmap.height // ie. 16/9, 4/3
+
+    // set longest side of the image to size normalized value
+    // precompute the other side using the real image ratio
+    // longest side will always max to 1
+    if (bitmap.width > bitmap.height) {
+        attributes.width = attributes.size
+        attributes.height = attributes.size * widthToHeightRatio
+    }
+    else {
+        attributes.height = attributes.size
+        attributes.width = attributes.size / widthToHeightRatio
+    }
+
+    for (let i = 1; i <= thisToken.quantity; i++) {
+
+        let fragment = {
+            name: thisToken.token.name,
+            imageBitmap: bitmap,
+            attributes: attributes
+        }
+
+        if (p5) {
+            fragment.imageP5 = createP5Image(bitmap)
+        }
+
+        metacollector.artfragments.push(fragment)
     }
 }
+
+function createP5Image(bitmap) {
+
+    const pImg = new p5.Image(1, 1, this);
+
+    pImg.width = pImg.canvas.width = bitmap.width;
+    pImg.height = pImg.canvas.height = bitmap.height;
+
+    // Draw the image into the backing canvas of the p5.Image
+    pImg.drawingContext.drawImage(bitmap, 0, 0);
+    pImg.modified = true;
+
+    return pImg;
+}
+
+/*
+* Polyfill for createImageBitmap
+* https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap
+*
+* Supports CanvasImageSource (img, video, canvas) sources, Blobs, and ImageData.
+* 
+* Source: https://gist.github.com/pseudosavant/a6d970b945ae85ef4dbc43200da94faf
+*
+* From:
+* - https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
+* - https://gist.github.com/MonsieurV/fb640c29084c171b4444184858a91bc7
+* Updated by:
+* - Yoan Tournade <yoan@ytotech.com>
+* - diachedelic, https://gist.github.com/diachedelic
+* - Paul Ellis, https://pseudosavant.com
+*/
+
+(function createImageBitmapIIFE(global) {
+    function isCanvasImageSource(el) {
+        const validElements = ['img', 'video', 'canvas'];
+
+        return (el && el.tagName && validElements.includes(el.tagName.toLowerCase()));
+    }
+
+    function idealSize(currentValue, newValue, numerator, denominator) {
+        if (typeof newValue === 'number') return newValue;
+        if (typeof numerator !== 'number' || typeof denominator !== 'number') return currentValue;
+
+        return (numerator / denominator) * currentValue;
+    }
+
+    if (!('createImageBitmap' in global)) {
+        global.createImageBitmap = async function polyfillCreateImageBitmap(data, opts) {
+            return new Promise((resolve, reject) => {
+                opts = opts || {};
+
+                let dataURL;
+                const canvas = document.createElement('canvas');
+
+                try {
+                    const ctx = canvas.getContext('2d');
+
+                    if (data instanceof Blob) {
+                        dataURL = URL.createObjectURL(data);
+                    } else if (isCanvasImageSource(data)) {
+                        const width = data.naturalWidth || data.videoWidth || data.clientWidth || data.width
+                        const height = data.naturalHeight || data.videoHeight || data.clientHeight || data.height
+                        canvas.width = idealSize(width, opts.resizeWidth, opts.resizeHeight, height);
+                        canvas.height = idealSize(height, opts.resizeHeight, opts.resizeWidth, width);
+
+                        ctx.drawImage(data, 0, 0, canvas.width, canvas.height);
+
+                        dataURL = canvas.toDataURL();
+                    } else if (data instanceof ImageData) {
+                        canvas.width = idealSize(data.width, opts.resizeWidth, opts.resizeHeight, data.height);;
+                        canvas.height = idealSize(data.height, opts.resizeHeight, opts.resizeWidth, data.width);
+
+                        ctx.putImageData(data, 0, 0);
+
+                        dataURL = canvas.toDataURL();
+                    } else {
+                        reject('createImageBitmap does not handle the provided image source type');
+                    }
+
+                    const img = new Image();
+                    img.onerror = reject;
+                    img.onload = () => resolve(img);
+                    img.src = dataURL;
+                } finally {
+                    // avoid memory leaks on iOS Safari, see https://stackoverflow.com/a/52586606
+                    canvas.width = 0;
+                    canvas.height = 0;
+                }
+            });
+        };
+    }
+
+})(this);
