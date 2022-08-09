@@ -47,6 +47,8 @@ if (!metacollector.walletAddress) {
     metacollector.walletAddress = ""
 }
 
+metacollector.seed = xmur3(metacollector.walletAddress)()
+
 if (!Number.isInteger(metacollector.iteration)) {
     metacollector.iteration = 1
     onIterationUpdated(metacollector.iteration)
@@ -85,6 +87,8 @@ function init() {
     const targetNode = document.getElementsByTagName('body')[0]
 
     canvasObserver.observe(targetNode, canvasObserverConfig)
+
+    document.documentElement.style.setProperty('--random-hue-angle', Math.random() * 360);
 }
 
 function onCanvasReady(mutationList, observer) {
@@ -111,6 +115,9 @@ function onCanvasReady(mutationList, observer) {
 }
 
 function noTokensToShow() {
+
+    if (metacollector.artfragments.length > 0) { return }
+
     // manage no tokens found
     document.getElementById('nofragment').style.display = "block"
 
@@ -147,7 +154,7 @@ function onUserEnteredCollectorAddress() {
 
     metacollector.walletAddress = document.getElementById('collectoraddress').value;
 
-    metacollector.seed = xmur3(metacollector.walletAddress)
+    metacollector.seed = xmur3(metacollector.walletAddress)()
 
     url.searchParams.set("collectoraddress", metacollector.walletAddress);
 
@@ -172,6 +179,7 @@ function iterateMetacollector(event) {
     metacollector.iteration++
     console.log(metacollector.iteration)
     paintCollection(metacollector)
+    noTokensToShow()
     onIterationUpdated(metacollector.iteration)
 }
 
@@ -382,11 +390,16 @@ async function fetchProfile(collectorAddress) {
 
 function parseTokens(tokens) {
 
+    const ipfsGateway = "https://cloudflare-ipfs.com/ipfs/"
+    const ipfsGatewayAlt = "https://ipfs.fleek.co/ipfs/" // to use as a fallback
+
+
     metacollector.artfragments = []; // clearing the local data
 
     console.log(tokens)
 
     if (tokens.length < 1) {
+        paintCollection(metacollector)
         noTokensToShow()
         return
     }
@@ -398,7 +411,7 @@ function parseTokens(tokens) {
 
     for (const thisToken of tokens) {
 
-        let imageURL = thisToken.token.artifact_uri.replace("ipfs://", "https://ipfs.fleek.co/ipfs/") // using a public gateway. Later we could pin on our own gateway local to the web server to load them faster
+        const imageURL = thisToken.token.artifact_uri.replace("ipfs://", ipfsGateway) // using a public gateway. Later we could pin on our own gateway local to the web server to load them faster
 
         function parseAttributes(attributelist) {
 
