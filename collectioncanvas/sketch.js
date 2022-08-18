@@ -13,9 +13,9 @@ function setup() {
     noLoop();
 }
 
-// the onRequestPaintCollection() function is a hook that metacollector uses to call your sketch
+// the paintCollection() function is a hook that metacollector uses to call your sketch
 
-// it will called everytime your sketch must be drawn, and it receive the metacollector object:
+// it will be called everytime your sketch must be drawn, and it receives the metacollector object:
 
 // metacollector = {
 //     walletAddress, // first 3 characters tz1 are always identical
