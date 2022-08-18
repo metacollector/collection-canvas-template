@@ -17,7 +17,7 @@ const sandboxTokens = [
     "collectioncanvas/sandbox/tokens/0009.json",
 ]
 
-let metacollector = {
+let mc = {
     walletAddress: "",
     seed: "",
     iteration: 1,
@@ -31,7 +31,7 @@ let metacollector = {
 let url = new URL(location.href);
 let collectorAddressParam = url.searchParams.get("collectoraddress");
 
-metacollector.iteration = parseInt(location.hash.substring(1))
+mc.iteration = parseInt(location.hash.substring(1))
 
 let collectionCanvas
 
@@ -41,17 +41,15 @@ let canvasHeight
 let imageLoadingCountdown
 
 if (collectorAddressParam) {
-    metacollector.walletAddress = collectorAddressParam;
+    mc.walletAddress = collectorAddressParam;
 }
-if (!metacollector.walletAddress) {
-    metacollector.walletAddress = ""
+if (!mc.walletAddress) {
+    mc.walletAddress = ""
 }
 
-metacollector.seed = xmur3(metacollector.walletAddress)()
-
-if (!Number.isInteger(metacollector.iteration)) {
-    metacollector.iteration = 1
-    onIterationUpdated(metacollector.iteration)
+if (!Number.isInteger(mc.iteration)) {
+    mc.iteration = 1
+    onIterationUpdated(mc.iteration)
 }
 
 if (document.readyState === 'loading') {
@@ -60,20 +58,10 @@ if (document.readyState === 'loading') {
     init();
 }
 
-function xmur3(str) {
-    for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
-        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-        h = h << 13 | h >>> 19;
-    } return function () {
-        h = Math.imul(h ^ (h >>> 16), 2246822507);
-        h = Math.imul(h ^ (h >>> 13), 3266489909);
-        return (h ^= h >>> 16) >>> 0;
-    }
-}
 
 function init() {
 
-    document.getElementById('collectoraddress').value = metacollector.walletAddress;
+    document.getElementById('collectoraddress').value = mc.walletAddress;
 
     document.addEventListener('keydown', onKeyDown);
     window.addEventListener('resize', onWindowResized);
@@ -103,8 +91,8 @@ function onCanvasReady(mutationList, observer) {
 
         onWindowResized()
 
-        if (metacollector.walletAddress) {
-            fetchCollectorData(metacollector.walletAddress)
+        if (mc.walletAddress) {
+            fetchCollectorData(mc.walletAddress)
         }
         else {
             noTokensToShow()
@@ -116,12 +104,12 @@ function onCanvasReady(mutationList, observer) {
 
 function noTokensToShow() {
 
-    if (metacollector.artfragments.length > 0) { return }
+    if (mc.artfragments.length > 0) { return }
 
     // manage no tokens found
     document.getElementById('nofragment').style.display = "block"
 
-    var ctx = collectionCanvas.getContext('2d');
+    let ctx = collectionCanvas.getContext('2d')
     ctx.resetTransform()
     ctx.font = `${(canvasWidth / 13)}px sans-serif`
     ctx.fillStyle = "white"
@@ -152,15 +140,13 @@ function onKeyDown(event) {
 
 function onUserEnteredCollectorAddress() {
 
-    metacollector.walletAddress = document.getElementById('collectoraddress').value;
+    mc.walletAddress = document.getElementById('collectoraddress').value;
 
-    metacollector.seed = xmur3(metacollector.walletAddress)()
-
-    url.searchParams.set("collectoraddress", metacollector.walletAddress);
+    url.searchParams.set("collectoraddress", mc.walletAddress);
 
     window.history.replaceState({}, '', url.toString());
 
-    fetchCollectorData(metacollector.walletAddress)
+    fetchCollectorData(mc.walletAddress)
 }
 
 function renderSandboxCanvas(url) {
@@ -176,11 +162,11 @@ function renderSandboxCanvas(url) {
 }
 
 function iterateMetacollector(event) {
-    metacollector.iteration++
-    console.log(metacollector.iteration)
-    paintCollection(metacollector)
+    mc.iteration++
+    console.log(mc.iteration)
+    paintCollectionUsingClone(mc)
     noTokensToShow()
-    onIterationUpdated(metacollector.iteration)
+    onIterationUpdated(mc.iteration)
 }
 
 function onIterationUpdated(iteration) {
@@ -188,12 +174,12 @@ function onIterationUpdated(iteration) {
     iteration = !iteration ? "" : iteration
     url.hash = iteration
     window.history.replaceState({}, '', url.toString());
-    metacollector.iteration = parseInt(location.hash.substring(1))
+    mc.iteration = parseInt(location.hash.substring(1))
 }
 
 function fetchCollectorData(userInputCollectorAddress) {
 
-    nftQuery = fetchTokens(userInputCollectorAddress)
+    let nftQuery = fetchTokens(userInputCollectorAddress)
 
     nftQuery
         .then(
@@ -242,9 +228,12 @@ function onWindowResized() {
         collectionCanvas.height = canvasHeight
         collectionCanvas.style.width = canvasWidth / pixelDensity + "px"
         collectionCanvas.style.height = canvasHeight / pixelDensity + "px"
-        metacollector.canvas.visualWidth = canvasWidth / pixelDensity
-        metacollector.canvas.visualHeight = canvasWidth / pixelDensity
-        paintCollection(metacollector)
+        mc.canvas.visualWidth = canvasWidth / pixelDensity
+        mc.canvas.visualHeight = canvasWidth / pixelDensity
+        collectionCanvas.style.height = canvasHeight / pixelDensity + "px"
+        mc.canvas.pixelWidth = canvasWidth
+        mc.canvas.pixelHeight = canvasWidth
+        paintCollectionUsingClone(mc)
     }
 }
 
@@ -394,12 +383,12 @@ function parseTokens(tokens) {
     const ipfsGatewayAlt = "https://ipfs.fleek.co/ipfs/" // to use as a fallback
 
 
-    metacollector.artfragments = []; // clearing the local data
+    mc.artfragments = []; // clearing the local data
 
     console.log(tokens)
 
     if (tokens.length < 1) {
-        paintCollection(metacollector)
+        paintCollectionUsingClone(mc)
         noTokensToShow()
         return
     }
@@ -419,7 +408,7 @@ function parseTokens(tokens) {
 
             flattenedObject.colors = []
 
-            for (obj of attributelist) {
+            for (let obj of attributelist) {
 
                 // console.log(obj.attribute)
 
@@ -468,12 +457,33 @@ function parseTokens(tokens) {
                         let ctx = collectionCanvas.getContext('2d')
                         ctx.resetTransform()
                         ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
-                        paintCollection(metacollector)
+                        paintCollectionUsingClone(mc)
                     }
                 }
             )
     }
 
+}
+
+function paintCollectionUsingClone(metacollector) {
+
+    let clonedMetacollector;
+
+    if (window.structuredClone) {
+
+        clonedMetacollector = structuredClone(metacollector)
+    }
+    else {
+
+        clonedMetacollector = JSON.parse(JSON.stringify(metacollector))
+    }
+
+    clonedMetacollector.seed = xmur3(metacollector.walletAddress)()
+
+    clonedMetacollector.random = new aleaPRNG(metacollector.walletAddress)
+    clonedMetacollector.randomIteration = new aleaPRNG(metacollector.iteration)
+
+    paintCollection(clonedMetacollector)
 }
 
 function loadingMessage(countdown, nextName) {
@@ -482,7 +492,7 @@ function loadingMessage(countdown, nextName) {
     ctx.resetTransform()
     ctx.clearRect(0, 0, collectionCanvas.width, collectionCanvas.height)
 
-    paintCollection(metacollector)
+    paintCollectionUsingClone(mc)
 
     ctx.resetTransform()
     ctx.font = `${(collectionCanvas.width / 20)}px sans-serif`
@@ -498,19 +508,22 @@ function pushImage(bitmap, thisToken, parsedAttributes) {
 
     let { ...attributes } = parsedAttributes // cloning the attributes
 
-    let widthToHeightRatio = bitmap.width / bitmap.height // ie. 16/9, 4/3
+    attributes.widthToHeightRatio = bitmap.height / bitmap.width   // multiple to get height from width
 
     // set longest side of the image to size normalized value
     // precompute the other side using the real image ratio
     // longest side will always max to 1
     if (bitmap.width > bitmap.height) {
         attributes.width = attributes.size
-        attributes.height = attributes.size * widthToHeightRatio
+        attributes.height = attributes.size * attributes.widthToHeightRatio
     }
     else {
         attributes.height = attributes.size
-        attributes.width = attributes.size / widthToHeightRatio
+        attributes.width = attributes.size / attributes.widthToHeightRatio
     }
+
+    attributes.displayWidth = collectionCanvas.width * attributes.width;
+    attributes.displayHeight = collectionCanvas.width * attributes.height;
 
     for (let i = 1; i <= thisToken.quantity; i++) {
 
@@ -520,11 +533,11 @@ function pushImage(bitmap, thisToken, parsedAttributes) {
             attributes: attributes
         }
 
-        if (p5) {
+        if (self.p5) {
             fragment.imageP5 = createP5Image(bitmap)
         }
 
-        metacollector.artfragments.push(fragment)
+        mc.artfragments.push(fragment)
     }
 }
 
@@ -619,4 +632,195 @@ function createP5Image(bitmap) {
         };
     }
 
-})(this);
+})(self);
+
+// MurmurHash3
+
+function xmur3(str) {
+    for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
+        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+        h = h << 13 | h >>> 19;
+    } return function () {
+        h = Math.imul(h ^ (h >>> 16), 2246822507);
+        h = Math.imul(h ^ (h >>> 13), 3266489909);
+        return (h ^= h >>> 16) >>> 0;
+    }
+}
+
+// Alea
+// original article https://web.archive.org/web/20110608011113/http://baagoe.com/en/RandomMusings/javascript/
+// mirror https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
+// alt implementation: https://github.com/davidbau/seedrandom/blob/released/lib/alea.js
+// alt implementation https://github.com/coverslide/node-alea/blob/master/alea.js
+// this implementation https://github.com/macmcmeans/aleaPRNG/blob/master/aleaPRNG-1.1.js
+
+function aleaPRNG() {
+    return (function (args) {
+        "use strict";
+
+        const version = 'aleaPRNG 1.1.0';
+
+        var s0
+            , s1
+            , s2
+            , c
+            , uinta = new Uint32Array(3)
+            , initialArgs
+            , mashver = ''
+            ;
+
+        /* private: initializes generator with specified seed */
+        function _initState(_internalSeed) {
+            var mash = Mash();
+
+            // internal state of generator
+            s0 = mash(' ');
+            s1 = mash(' ');
+            s2 = mash(' ');
+
+            c = 1;
+
+            for (var i = 0; i < _internalSeed.length; i++) {
+                s0 -= mash(_internalSeed[i]);
+                if (s0 < 0) { s0 += 1; }
+
+                s1 -= mash(_internalSeed[i]);
+                if (s1 < 0) { s1 += 1; }
+
+                s2 -= mash(_internalSeed[i]);
+                if (s2 < 0) { s2 += 1; }
+            }
+
+            mashver = mash.version;
+
+            mash = null;
+        };
+
+        /* private: dependent string hash function */
+        function Mash() {
+            var n = 4022871197; // 0xefc8249d
+
+            var mash = function (data) {
+                data = data.toString();
+
+                // cache the length
+                for (var i = 0, l = data.length; i < l; i++) {
+                    n += data.charCodeAt(i);
+
+                    var h = 0.02519603282416938 * n;
+
+                    n = h >>> 0;
+                    h -= n;
+                    h *= n;
+                    n = h >>> 0;
+                    h -= n;
+                    n += h * 4294967296; // 0x100000000      2^32
+                }
+                return (n >>> 0) * 2.3283064365386963e-10; // 2^-32
+            };
+
+            mash.version = 'Mash 0.9';
+            return mash;
+        };
+
+
+        /* private: check if number is integer */
+        function _isInteger(_int) {
+            return parseInt(_int, 10) === _int;
+        };
+
+        /* public: return a 32-bit fraction in the range [0, 1]
+        This is the main function returned when aleaPRNG is instantiated
+        */
+        var random = function () {
+            var t = 2091639 * s0 + c * 2.3283064365386963e-10; // 2^-32
+
+            s0 = s1;
+            s1 = s2;
+
+            return s2 = t - (c = t | 0);
+        };
+
+        /* public: return a 53-bit fraction in the range [0, 1] */
+        random.fract53 = function () {
+            return random() + (random() * 0x200000 | 0) * 1.1102230246251565e-16; // 2^-53
+        };
+
+        /* public: return an unsigned integer in the range [0, 2^32] */
+        random.int32 = function () {
+            return random() * 0x100000000; // 2^32
+        };
+
+        /* public: advance the generator the specified amount of cycles */
+        random.cycle = function (_run) {
+            _run = typeof _run === 'undefined' ? 1 : +_run;
+            if (_run < 1) { _run = 1; }
+            for (var i = 0; i < _run; i++) { random(); }
+        };
+
+        /* public: return inclusive range */
+        random.range = function () {
+            var loBound
+                , hiBound
+                ;
+
+            if (arguments.length === 1) {
+                loBound = 0;
+                hiBound = arguments[0];
+
+            } else {
+                loBound = arguments[0];
+                hiBound = arguments[1];
+            }
+
+            if (arguments[0] > arguments[1]) {
+                loBound = arguments[1];
+                hiBound = arguments[0];
+            }
+
+            // return integer
+            if (_isInteger(loBound) && _isInteger(hiBound)) {
+                return Math.floor(random() * (hiBound - loBound + 1)) + loBound;
+
+                // return float
+            } else {
+                return random() * (hiBound - loBound) + loBound;
+            }
+        };
+
+        /* public: initialize generator with the seed values used upon instantiation */
+        random.restart = function () {
+            _initState(initialArgs);
+        };
+
+        /* public: seeding function */
+        random.seed = function () {
+            _initState(Array.prototype.slice.call(arguments));
+        };
+
+        /* public: show the version of the RNG */
+        random.version = function () {
+            return version;
+        };
+
+        /* public: show the version of the RNG and the Mash string hasher */
+        random.versions = function () {
+            return version + ', ' + mashver;
+        };
+
+        // when no seed is specified, create a random one from Windows Crypto (Monte Carlo application) 
+        if (args.length === 0) {
+            window.crypto.getRandomValues(uinta);
+            args = [uinta[0], uinta[1], uinta[2]];
+        };
+
+        // store the seed used when the RNG was instantiated, if any
+        initialArgs = args;
+
+        // initialize the RNG
+        _initState(args);
+
+        return random;
+
+    })(Array.prototype.slice.call(arguments));
+};
