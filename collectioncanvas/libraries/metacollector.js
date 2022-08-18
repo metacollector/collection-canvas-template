@@ -478,6 +478,14 @@ function paintCollectionUsingClone(metacollector) {
         clonedMetacollector = JSON.parse(JSON.stringify(metacollector))
     }
 
+    // adding unclonable properties to the metacollector object
+
+    if (self.p5) {
+        for (let fragment of clonedMetacollector.artfragments) {
+            fragment.imageP5 = createP5Image(fragment.imageBitmap)
+        }
+    }
+
     clonedMetacollector.seed = xmur3(metacollector.walletAddress)()
 
     clonedMetacollector.random = new aleaPRNG(metacollector.walletAddress)
@@ -531,10 +539,6 @@ function pushImage(bitmap, thisToken, parsedAttributes) {
             name: thisToken.token.name,
             imageBitmap: bitmap,
             attributes: attributes
-        }
-
-        if (self.p5) {
-            fragment.imageP5 = createP5Image(bitmap)
         }
 
         mc.artfragments.push(fragment)
